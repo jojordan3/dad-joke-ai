@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# Files
+.vscode/
+dadjokes-subreddit-archive/dadjokes.csv
+
 # Distribution / packaging
 .Python
 build/
