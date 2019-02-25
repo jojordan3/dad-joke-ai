@@ -32,48 +32,47 @@ import sys
 def filter_jokes(data):
     r_dadjokes = []
 
-#    tracker_l = len(data)
-#    i = 0
-#    progress = 0
+    tracker_l = len(data)
+    i = 0
+    progress = 0
+    width = 55
+
+    sys.stdout.write(f"Step {step} Progress: [>{' ' * (width - 1)}] 0.0%")
+    sys.stdout.flush()
+    sys.stdout.write('\b' * 4)
 
     for d in data:
-        # i, progress = progressbar(
-        #    tracker_l, i=i, current=progress, step='2')
+        current = int(width * i / tracker_l)
+        percent = i * 100 / tracker_l
+        if progress < current:
+            sys.stdout.write('\r')
+            sys.stdout.write(f"Step {step} Progress: \
+[{'=' * progress}>{' ' * (width - progress - 1)}] {percent:.1f}%")
+            sys.stdout.flush()
+            progress = current
+        else:
+            sys.stdout.write(f'{percent:.1f}%')
+            sys.stdout.flush()
+        sys.stdout.write('\b' * len(f'{percent:.1f}%'))
+        i += 1
 
         if 't5_2t0no' in d:
-            r_dadjokes.append(d[:-1])
+            joke = json.loads(d)
+            if joke['selftext']:
+                if 'https://' in joke['selftext']:
+                    continue
+                else:
+                    a = re.sub(r'\w* edit.*', '', joke['selftext'],
+                               flags=re.I | re.M)
+                    submission = f'Q: {joke["title"]}\nA: {a}'
+            else:
+                submission = str(joke['title'])
+            r_dadjokes.append([joke['id'], submission, joke['score'],
+                               joke['num_comments'], joke['created_utc']])
 
     del data
 
     return r_dadjokes
-
-
-def transform_jokes(r_dadjokes):  # n_jokes
-    jokes_from_file = []
-
-#    j = 0
-#    progress = 0
-
-    for joke in r_dadjokes:
-        # j, progress = progressbar(
-        #   n_jokes, i=j, current=progress, step='3')
-
-        joke = json.loads(joke)
-        if joke['selftext']:
-            if 'https://' in joke['selftext']:
-                continue
-            else:
-                a = re.sub(r'\w* edit.*', '', joke['selftext'],
-                           flags=re.I | re.M)
-                submission = f'Q: {joke["title"]}\nA: {a}'
-        else:
-            submission = str(joke['title'])
-        jokes_from_file.append([joke['id'], submission, joke['score'],
-                                joke['num_comments'], joke['created_utc']])
-
-    del r_dadjokes
-
-    return jokes_from_file
 
 
 if __name__ == "__main__":
@@ -90,10 +89,11 @@ Step 1: Read File -- Completed
     r_dadjokes = filter_jokes(data)
     n_jokes = len(r_dadjokes)
 
-    print(f"""\n    {n_jokes} found
+    sys.stdout.write(f"""\n    {n_jokes} found
 ----------------------------------------\n""")
+    sys.stdout.flush()
 
-    jokes_from_file = transform_jokes(r_dadjokes)  # n_jokes
+    jokes_from_file = transform_jokes(r_dadjokes, n_jokes)
 
     dadjoke_df = pd.DataFrame(data=jokes_from_file,
                               columns=['id', 'joke', 'score', 'num_comments',
