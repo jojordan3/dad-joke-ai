@@ -41,7 +41,7 @@ def filter_jokes(data):
     sys.stdout.flush()
     sys.stdout.write('\b' * 4)
 
-    for d in data:
+    while data:
         current = int(width * i / tracker_l)
         percent = i * 100 / tracker_l
         if progress < current:
@@ -56,8 +56,10 @@ def filter_jokes(data):
         sys.stdout.write('\b' * len(f'{percent:.1f}%'))
         i += 1
 
-        if 't5_2t0no' in d:
-            joke = json.loads(d)
+        submission = data.pop(0)
+
+        if 't5_2t0no' in submission:
+            joke = json.loads(submission)
             if joke['selftext']:
                 if 'https://' in joke['selftext']:
                     continue
@@ -89,17 +91,16 @@ Step 1: Read File -- Completed
     r_dadjokes = filter_jokes(data)
     n_jokes = len(r_dadjokes)
 
-    sys.stdout.write(f"""\n    {n_jokes} found
+    print(f"""\nStep 2: Filter Jokes -- Completed
+    with {n_jokes} found
 ----------------------------------------\n""")
     sys.stdout.flush()
 
-    jokes_from_file = transform_jokes(r_dadjokes, n_jokes)
-
-    dadjoke_df = pd.DataFrame(data=jokes_from_file,
+    dadjoke_df = pd.DataFrame(data=r_dadjokes,
                               columns=['id', 'joke', 'score', 'num_comments',
                                        'created']).set_index('id')
 
-    del jokes_from_file
+    del r_dadjokes
 
     print("""\n   Configure Dad Jokes -- Completed
 ----------------------------------------""")
@@ -121,3 +122,5 @@ dadjokes increased by {after-before} bytes with the following data
 dadjokes total size: {after}
 data added from {filename}""")
     print("----------------Success!----------------")
+
+del dadjoke_df
