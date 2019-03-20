@@ -3,7 +3,10 @@ import pandas as pd
 import json
 import os
 import sys
-
+'''First
+curl -O <download_link>
+[appropriate_decompression] [filename]
+'''
 
 # def progressbar(obj_length, i, current, step):
 #    width = 55
