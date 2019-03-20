@@ -10,6 +10,9 @@ __pycache__/
 .vscode/
 dadjokes-subreddit-archive/dadjokes.csv
 
+# PRAW - reddit api
+praw.ini
+
 # Distribution / packaging
 .Python
 build/
