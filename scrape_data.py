@@ -1,10 +1,18 @@
-from bs4 import BeautifulSoup as bsoup
+'''
+Scrape data from icanhazdadjoke
+'''
 import requests
-import re
-from lxml import html
+from bs4 import BeautifulSoup as bsoup
 
 
 def get_icanhaz():
+    '''
+    Get all dadjokes from website
+    Returns
+    ---------------------------------
+    dad_jokes : list
+        list of strings
+    '''
     base_url = 'https://icanhazdadjoke.com/search'
     r = requests.get(base_url)
 
@@ -17,6 +25,7 @@ def get_icanhaz():
 
     dad_jokes = []
 
+    # Loop through pages to get dadjokes
     for i in list(range(1, last_page + 1)):
         url = base_url + f'?term=&page={i}'
         r = requests.get(url)
@@ -27,8 +36,9 @@ def get_icanhaz():
     return dad_jokes
 
 if __name__ == "__main__":
-    dj = get_icanhaz()
+    DJ = get_icanhaz()
 
     with open('icanhaz.csv', 'a') as f:
-        for line in dj:
-            f.write(line)
+        for line in DJ:
+            f.write(' '.join(line.split()))
+            f.write('\n')
