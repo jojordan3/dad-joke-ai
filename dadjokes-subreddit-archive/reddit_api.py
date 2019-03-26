@@ -3,32 +3,67 @@ import time
 import sys
 import os
 
-data_col = ['id', 'created_utc', 'title', 'selftext', 'score', 'upvote_ratio',
-            'gilded', 'over_18', 'num_comments']
-gildings = ['gid_1', 'gid_2', 'gid_3']
+data_col_PRAW = ['id', 'created_utc', 'title', 'selftext', 'score',
+                 'upvote_ratio', 'gilded', 'over_18', 'num_comments']
+data_col_req = ['name', 'created_utc', 'title', 'selftext', 'author',
+                'score', 'downs', 'ups', 'over_18', 'num_comments']
+gild = ['gid_1', 'gid_2', 'gid_3']
 r = praw.Reddit('')
 
 
-def write_joke(submission, jokes):
+def write_joke(submission, jokes, how, data_col=None):
+    if how == 'PRAW':
+        data_col = data_col_PRAW
+    elif how == 'requests':
+        if not data_col:
+            data_col = data_col_req
+    else:
+        raise ValueError('how must be either "PRAW" or "requests"')
     try:
-        medals = submission.gildings
-        author = submission.author
-        sub_vars = vars(submission)
-        data = [sub_vars[i] if i in sub_vars else '' for i in data_col]
-        try:
-            data.append(author.name)
-        except AttributeError:
-            data.append('')
-        data.extend([medals[g] for g in gildings])
+        if how == "PRAW":
+            medals = submission.gildings
+            author = submission.author
+            s_vars = vars(submission)
+            data = [s_vars[i] if i in s_vars else '' for i in data_col]
+            try:
+                data.append(author.name)
+            except AttributeError:
+                data.append('')
+        elif how == "requests":
+            try:
+                medals = submission['gildings']
+            except:
+                medals = {}
+                for g in gild:
+                    medals[g] = 0
+            finally:
+                data = []
+                for col in data_col:
+                    try:
+                        data.append(submission[col])
+                    except KeyError:
+                        data.append('')
+        data.extend([medals[g] for g in gild])
         jokes.write(str(data)[1:-1] + '\n')
     except:
-        print(f'\nError processing t3_{submission.id}\n')
-        raise
+        try:
+            print(f'\nError processing t3_{submission.id}\n')
+        except:
+            try:
+                print(f'\nError processing {submission["name"]}\n')
+            except:
+                try:
+                    print(f'\nError processing t3_{submission["id"]}\n')
+                except:
+                    raise
+        finally:
+            raise
 
 
 def next_batch(how='before', last=None):
     batch = r.subreddit('dadjokes').new(params={how: last})
-    orig = os.path.getsize('/Users/joannejordan/Desktop/GitHub/dad-joke-ai/dadjokes-subreddit-archive/rdadjokes.csv')
+    orig = os.path.getsize('/Users/joannejordan/Desktop/GitHub/dad-joke-ai/\
+dadjokes-subreddit-archive/rdadjokes.csv')
     with open('rdadjokes.csv', 'a') as jokes, open('records.txt',
                                                    'a') as records:
         i = 0
@@ -37,10 +72,11 @@ def next_batch(how='before', last=None):
                 records.write(f't3_{submission.id} to ')
             else:
                 last = f't3_{submission.id}'
-            write_joke(submission, jokes)
+            write_joke(submission, jokes, 'PRAW')
             i += 1
             time.sleep(1)
-        new = os.path.getsize('/Users/joannejordan/Desktop/GitHub/dad-joke-ai/dadjokes-subreddit-archive/rdadjokes.csv')
+        new = os.path.getsize('/Users/joannejordan/Desktop/GitHub/dad-joke-ai/\
+dadjokes-subreddit-archive/rdadjokes.csv')
         if new == orig:
             raise ValueError('Nothing added')
         records.write(last + '\n')
