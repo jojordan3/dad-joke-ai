@@ -3,9 +3,10 @@ import json
 import os
 import requests
 import sys
+from write_joke import write_joke
 from datetime import datetime as dt
 from dateutil import tz
-from reddit_api import write_joke
+
 
 joke_file = '/Users/joannejordan/Desktop/GitHub/dad-joke-ai/dadjokes-subreddit-\
 archive/pushshift.csv'
@@ -46,7 +47,7 @@ def get_list(how, UTC):
             with open(joke_file, 'a') as jk, open(record_file, 'a') as rec:
                 for submission in data:
                     try:
-                        sub_id = "t3_" + submission['id'] + ","
+                        sub_id = "t3_" + submission['id']
                     except:
                         print(submission)
                         raise

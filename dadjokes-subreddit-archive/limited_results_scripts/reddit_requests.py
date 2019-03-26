@@ -6,8 +6,8 @@ import requests
 import requests.auth
 import sys
 import time
-from local_settings import *
-from reddit_api import write_joke
+from .local_settings import *
+from ..write_joke import write_joke
 
 
 # Files to read and write
