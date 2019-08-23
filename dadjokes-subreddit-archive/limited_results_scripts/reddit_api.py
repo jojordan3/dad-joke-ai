@@ -3,7 +3,7 @@ import praw
 import time
 import sys
 import os
-from ..write_joke import write_joke
+from ..write_joke import *
 
 r = praw.Reddit('')
 

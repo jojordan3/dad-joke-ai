@@ -7,7 +7,7 @@ import requests.auth
 import sys
 import time
 from .local_settings import *
-from ..write_joke import write_joke
+from ..write_joke import *
 
 
 # Files to read and write

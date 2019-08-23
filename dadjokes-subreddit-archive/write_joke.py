@@ -7,7 +7,7 @@ data_col_req = ['name', 'created_utc', 'title', 'selftext', 'author',
                 'score', 'downs', 'ups', 'over_18', 'num_comments']
 
 
-def write_joke(submission, jokes, how, data_col=None):
+def write_joke(submission, jokes, how, data_col=None, parent=None):
     '''
     Write jokes to csv
 
@@ -23,9 +23,6 @@ def write_joke(submission, jokes, how, data_col=None):
     data_col : list
         list of strings designating the features to be taken from the
         submission object - varies depending on usage
-    num_no_guildings : int
-        number of submissions for this batch for which gildings/medal
-        information could not be retrieved
     '''
     if how == 'PRAW':
         data_col = data_col_PRAW
@@ -43,14 +40,16 @@ def write_joke(submission, jokes, how, data_col=None):
                 data.append(author.name)
             except AttributeError:
                 data.append('')
-        elif how == "requests":
-            data = []
-            for col in data_col:
-                try:
-                    data.append(submission[col])
-                except KeyError:
-                    data.append('')
-        jokes.write(str(data)[1:-1] + '\n')
+        else:
+            for col in data_col[:-1]:
+                if parent and (col in ['title', 'selftext']):
+                    jokes.write(str(parent[col]) + ',')
+                else:
+                    try:
+                        jokes.write(str(submission[col]) + ',')
+                    except:
+                        jokes.write(',')
+            jokes.write(str(submission[data_col[-1]]) + '\n')
     except:
         try:
             print(f'\nError processing t3_{submission.id}\n')

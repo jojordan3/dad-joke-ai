@@ -70,20 +70,19 @@ def get_list(how, UTC):
                         parents = submission['crosspost_parent_list']
                     except KeyError:
                         parent_UTC = 'N/A'
-                    else:
-                        parent_post = parents[0]
-                        parent_UTC = _get_created_time(parent_post)
-                    try:
                         jk.write(','.join([sub_id, str(created_utc),
                                            str(parent_UTC)]) + ',')
                         write_joke(submission, jk, 'requests',
                                    data_col=data_cols)
-                    except:
-                        print(submission)
-                        raise
                     else:
-                        rec.write(str(created_utc) + '\n')
-                        i += 1
+                        parent_post = parents[0]
+                        parent_UTC = _get_created_time(parent_post)
+                        jk.write(','.join([sub_id, str(created_utc),
+                                           str(parent_UTC)]) + ',')
+                        write_joke(submission, jk, 'requests',
+                                   data_col=data_cols, parent=parent_post)
+                    rec.write(str(created_utc) + '\n')
+                    i += 1
             new = os.path.getsize(joke_file)
             if new == orig:
                 raise ValueError('Nothing Added')
