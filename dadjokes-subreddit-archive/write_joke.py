@@ -5,7 +5,6 @@ data_col_PRAW = ['id', 'created_utc', 'title', 'selftext', 'score',
                  'upvote_ratio', 'gilded', 'over_18', 'num_comments']
 data_col_req = ['name', 'created_utc', 'title', 'selftext', 'author',
                 'score', 'downs', 'ups', 'over_18', 'num_comments']
-gild = ['gid_1', 'gid_2', 'gid_3']
 
 
 def write_joke(submission, jokes, how, data_col=None):
@@ -24,6 +23,9 @@ def write_joke(submission, jokes, how, data_col=None):
     data_col : list
         list of strings designating the features to be taken from the
         submission object - varies depending on usage
+    num_no_guildings : int
+        number of submissions for this batch for which gildings/medal
+        information could not be retrieved
     '''
     if how == 'PRAW':
         data_col = data_col_PRAW
@@ -34,29 +36,20 @@ def write_joke(submission, jokes, how, data_col=None):
         raise ValueError('how must be either "PRAW" or "requests"')
     try:
         if how == "PRAW":
-            medals = submission.gildings
             author = submission.author
             s_vars = vars(submission)
-            data = [s_vars[i] if i in s_vars else '' for i in data_col]
+            data = [s_vars[i] if i in s_vars else 'N/A' for i in data_col]
             try:
                 data.append(author.name)
             except AttributeError:
                 data.append('')
         elif how == "requests":
-            try:
-                medals = submission['gildings']
-            except:
-                medals = {}
-                for g in gild:
-                    medals[g] = 0
-            finally:
-                data = []
-                for col in data_col:
-                    try:
-                        data.append(submission[col])
-                    except KeyError:
-                        data.append('')
-        data.extend([medals[g] for g in gild])
+            data = []
+            for col in data_col:
+                try:
+                    data.append(submission[col])
+                except KeyError:
+                    data.append('')
         jokes.write(str(data)[1:-1] + '\n')
     except:
         try:

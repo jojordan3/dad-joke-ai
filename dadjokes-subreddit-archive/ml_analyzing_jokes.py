@@ -10,3 +10,4 @@ archive/pushshift.csv'
 dj = pd.read_csv(csv_path)
 dj.drop(columns=['NA'], inplace=True)
 dj.apply()
+

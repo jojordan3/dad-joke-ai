@@ -8,19 +8,32 @@ from datetime import datetime as dt
 from dateutil import tz
 
 
-joke_file = '/Users/joannejordan/Desktop/GitHub/dad-joke-ai/dadjokes-subreddit-\
-archive/pushshift.csv'
-record_file = '/Users/joannejordan/Desktop/GitHub/dad-joke-ai/dadjokes-\
-subreddit-archive/pushshift.txt'
-base_URL = 'https://api.pushshift.io/reddit/search/submission/?q=&size=500&\
+joke_file = '/Users/joannejordan/Desktop/dad-joke-ai/dadjokes-subreddit-\
+archive/data_redditdadjokes.csv'
+record_file = '/Users/joannejordan/Desktop/dad-joke-ai/dadjokes-subreddit-\
+archive/data_redditdadjokes.txt'
+base_URL = 'https://api.pushshift.io/reddit/submission/search/?q=&size=500&\
 subreddit=dadjokes&'
-data_cols = ['title', 'selftext', 'author', 'score', 'over_18', 'num_comments']
+data_cols = ['author', 'author_fullname', 'title', 'selftext', 'score',
+             'num_comments']
 dadjokes_created_utc = 1319375605
 
 
-# Make sure it's doing what it's supposed to before running
+def _get_created_time(submission):
+    try:
+        created_utc = submission['created_utc']
+    except KeyError:
+        try:
+            created_utc = submission['created']
+        except:
+            print(f'Error processing timestamp for\n{submission}')
+            raise
+    return int(created_utc)
+
+
 def get_list(how, UTC):
-    '''Get list of submissions'''
+    '''Get list of submissions, before or after previously recorded
+    submissions.'''
     if how not in ['before', 'after']:
         while True:
             which = input('Please select [b] before or [a] after: ')
@@ -48,24 +61,21 @@ def get_list(how, UTC):
             with open(joke_file, 'a') as jk, open(record_file, 'a') as rec:
                 for submission in data:
                     try:
-                        sub_id = "t3_" + submission['id']
+                        sub_id = submission['id']
                     except:
                         print(submission)
                         raise
+                    created_utc = _get_created_time(submission)
                     try:
-                        created_utc = submission['created_utc']
+                        parents = submission['crosspost_parent_list']
                     except KeyError:
-                        try:
-                            created_utc = submission['created']
-                        except:
-                            raise
-                    except:
-                        print('Error processing timestamp for t3_' +
-                              str(submission['id']))
-                        print(submission)
-                        raise
+                        parent_UTC = 'N/A'
+                    else:
+                        parent_post = parents[0]
+                        parent_UTC = _get_created_time(parent_post)
                     try:
-                        jk.write(','.join([sub_id, str(created_utc)]) + ',')
+                        jk.write(','.join([sub_id, str(created_utc),
+                                           str(parent_UTC)]) + ',')
                         write_joke(submission, jk, 'requests',
                                    data_col=data_cols)
                     except:
@@ -95,7 +105,7 @@ def get_cutoff(how):
     utcs.sort()
     if how == "before":
         cutoff = utcs[0]
-    if how == "after":
+    elif how == "after":
         cutoff = utcs[-1]
     return cutoff
 

@@ -23,7 +23,7 @@ dadjokes-subreddit-archive/rdadjokes.csv')
             write_joke(submission, jokes, 'PRAW')
             i += 1
             time.sleep(1)
-        new = os.path.getsize('/Users/joannejordan/Desktop/GitHub/dad-joke-ai/\
+        new = os.path.getsize('/Users/joannejordan/Desktop/dad-joke-ai/\
 dadjokes-subreddit-archive/rdadjokes.csv')
         if new == orig:
             raise ValueError('Nothing added')
