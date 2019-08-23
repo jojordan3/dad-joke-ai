@@ -78,7 +78,8 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
-
+*.DS_Store
+*data_*
 # pyenv
 .python-version
 

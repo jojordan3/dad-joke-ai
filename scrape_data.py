@@ -38,7 +38,7 @@ def get_icanhaz():
 if __name__ == "__main__":
     DJ = get_icanhaz()
 
-    with open('icanhaz.csv', 'a') as f:
+    with open('data_icanhaz.csv', 'a') as f:
         for line in DJ:
             f.write(' '.join(line.split()))
             f.write('\n')
