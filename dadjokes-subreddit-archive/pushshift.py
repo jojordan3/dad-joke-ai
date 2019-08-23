@@ -18,6 +18,7 @@ data_cols = ['title', 'selftext', 'author', 'score', 'over_18', 'num_comments']
 dadjokes_created_utc = 1319375605
 
 
+# Make sure it's doing what it's supposed to before running
 def get_list(how, UTC):
     '''Get list of submissions'''
     if how not in ['before', 'after']:
@@ -38,7 +39,7 @@ def get_list(how, UTC):
         try:
             data = response.json()['data']
         except:
-            print(URL)
+            print(UTC)
             print(response)
             raise
         else:
@@ -108,7 +109,7 @@ if __name__ == "__main__":
         UTC = sys.argv[2]
     except:
         try:
-            UTC = get_cutoff(arg1)
+            UTC = get_cutoff(how)
         except:
             UTC = int(dt.utcnow().timestamp())
     finally:

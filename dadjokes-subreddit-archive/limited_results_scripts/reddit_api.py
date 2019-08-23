@@ -1,3 +1,4 @@
+'''Initial pull from subreddit'''
 import praw
 import time
 import sys
