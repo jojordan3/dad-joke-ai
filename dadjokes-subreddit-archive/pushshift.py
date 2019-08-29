@@ -14,8 +14,7 @@ record_file = '/Users/joannejordan/Desktop/dad-joke-ai/dadjokes-subreddit-\
 archive/data_redditdadjokes.txt'
 base_URL = 'https://api.pushshift.io/reddit/submission/search/?q=&size=500&\
 subreddit=dadjokes&'
-data_cols = ['author', 'author_fullname', 'title', 'selftext', 'score',
-             'num_comments']
+data_cols = ['author', 'title', 'selftext', 'score', 'num_comments']
 dadjokes_created_utc = 1319375605
 
 
@@ -70,15 +69,15 @@ def get_list(how, UTC):
                         parents = submission['crosspost_parent_list']
                     except KeyError:
                         parent_UTC = 'N/A'
-                        jk.write(','.join([sub_id, str(created_utc),
-                                           str(parent_UTC)]) + ',')
+                        jk.write('|'.join([sub_id, str(created_utc),
+                                           str(parent_UTC)]) + '|')
                         write_joke(submission, jk, 'requests',
                                    data_col=data_cols)
                     else:
                         parent_post = parents[0]
                         parent_UTC = _get_created_time(parent_post)
-                        jk.write(','.join([sub_id, str(created_utc),
-                                           str(parent_UTC)]) + ',')
+                        jk.write('|'.join([sub_id, str(created_utc),
+                                           str(parent_UTC)]) + '|')
                         write_joke(submission, jk, 'requests',
                                    data_col=data_cols, parent=parent_post)
                     rec.write(str(created_utc) + '\n')

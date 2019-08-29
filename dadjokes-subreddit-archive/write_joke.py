@@ -1,5 +1,6 @@
 '''Write jokes to csv'''
 import praw
+import string
 
 data_col_PRAW = ['id', 'created_utc', 'title', 'selftext', 'score',
                  'upvote_ratio', 'gilded', 'over_18', 'num_comments']
@@ -41,15 +42,19 @@ def write_joke(submission, jokes, how, data_col=None, parent=None):
             except AttributeError:
                 data.append('')
         else:
-            for col in data_col[:-1]:
-                if parent and (col in ['title', 'selftext']):
-                    jokes.write(str(parent[col]) + ',')
-                else:
-                    try:
-                        jokes.write(str(submission[col]) + ',')
-                    except:
-                        jokes.write(',')
-            jokes.write(str(submission[data_col[-1]]) + '\n')
+            data = []
+            for col in data_col:
+                try:
+                    if col in ['title', 'selftext']:
+                        if parent:
+                            data.append(_clean_str(parent[col]))
+                        else:
+                            data.append(_clean_str(submission[col]))
+                    else:
+                        data.append(str(submission[col]))
+                except:
+                    data.append('')
+            jokes.write('|'.join(data) + '\n')
     except:
         try:
             print(f'\nError processing t3_{submission.id}\n')
@@ -60,6 +65,18 @@ def write_joke(submission, jokes, how, data_col=None, parent=None):
                 try:
                     print(f'\nError processing t3_{submission["id"]}\n')
                 except:
-                    print(submission)
+                    pass
         finally:
+            print(submission)
             raise
+
+
+def _clean_str(val):
+    val = val.replace('"', "'")
+    new_val = val.replace('|', '^')
+    return _make_repr(new_val)
+
+
+def _make_repr(val):
+    rep = repr(val)[1:-1]
+    return '"' + rep + '"'
