@@ -8,12 +8,10 @@ from datetime import datetime as dt
 from dateutil import tz
 
 
-joke_file = '/Users/joannejordan/Desktop/dad-joke-ai/dadjokes-subreddit-\
-archive/data_redditdadjokes.csv'
-record_file = '/Users/joannejordan/Desktop/dad-joke-ai/dadjokes-subreddit-\
-archive/data_redditdadjokes.txt'
+joke_file = 'data_redditjokes.csv'
+record_file = 'data_redditjokes.txt'
 base_URL = 'https://api.pushshift.io/reddit/submission/search/?q=&size=500&\
-subreddit=dadjokes&'
+subreddit=jokes&'
 data_cols = ['author', 'title', 'selftext', 'score', 'num_comments']
 dadjokes_created_utc = 1319375605
 
