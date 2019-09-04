@@ -3,13 +3,14 @@ import json
 import os
 import requests
 import sys
+import psycopg2
 from write_joke import write_joke
 from datetime import datetime as dt
 from dateutil import tz
 
 
-joke_file = 'data_redditjokes.csv'
-record_file = 'data_redditjokes.txt'
+joke_file = 'data_jokes.csv'
+record_file = 'data_jokes.txt'
 base_URL = 'https://api.pushshift.io/reddit/submission/search/?q=&size=500&\
 subreddit=jokes&'
 data_cols = ['author', 'title', 'selftext', 'score', 'num_comments']
@@ -108,17 +109,11 @@ def get_cutoff(how):
 
 if __name__ == "__main__":
     try:
-        how = sys.argv[1]
+        subreddit = sys.argv[1]
     except:
         how = 'before'
-    try:
-        UTC = sys.argv[2]
-    except:
-        try:
-            UTC = get_cutoff(how)
-        except:
-            UTC = int(dt.utcnow().timestamp())
     finally:
+        UTC = int(dt.utcnow().timestamp())
         while UTC > dadjokes_created_utc:
             UTC, num = get_list(how, UTC)
             last_datetime = dt.fromtimestamp(UTC, tz=tz.tzutc())
